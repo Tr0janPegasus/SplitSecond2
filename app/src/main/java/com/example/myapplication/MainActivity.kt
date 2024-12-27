@@ -6,7 +6,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -37,6 +36,18 @@ class MainActivity : AppCompatActivity() {
 
         // Create notification channel
         createNotificationChannel()
+
+        // Check for the POST_NOTIFICATIONS permission and request it if not granted
+        if (ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                1001
+            )
+        }
 
         // Update the UI initially
         updateUI()
@@ -75,38 +86,30 @@ class MainActivity : AppCompatActivity() {
         notificationManager?.createNotificationChannel(channel)
     }
 
+    // This worker sends the reminder notification every 20 minutes
     class ReminderWorker(appContext: Context, workerParams: WorkerParameters) :
         Worker(appContext, workerParams) {
 
         override fun doWork(): Result {
-            // Show notification
-            val channelId = "ReminderChannel"
-            val builder = NotificationCompat.Builder(applicationContext, channelId)
-                .setContentTitle("Take a Break!")
-                .setContentText("Look away from your screen for a few minutes.")
-                .setSmallIcon(R.drawable.ic_launcher_foreground) // Replace with your app's icon
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setAutoCancel(true)
-
+            // Check if the permission is granted before showing the notification
             if (ActivityCompat.checkSelfPermission(
-                    applicationContext,  // Use "this" to refer to the current Activity
-                    Manifest.permission.POST_NOTIFICATIONS
+                    applicationContext, Manifest.permission.POST_NOTIFICATIONS
                 ) == PackageManager.PERMISSION_GRANTED
             ) {
-                // Request the permission or handle the lack of permission
+                // Show notification
+                val channelId = "ReminderChannel"
+                val builder = NotificationCompat.Builder(applicationContext, channelId)
+                    .setContentTitle("Take a Break!")
+                    .setContentText("Look away from your screen for a few minutes.")
+                    .setSmallIcon(R.drawable.ic_launcher_foreground) // Replace with your app's icon
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setAutoCancel(true)
 
+                // Notify the user
+                NotificationManagerCompat.from(applicationContext).notify(1, builder.build())
+            }
 
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return
+            return Result.success()
         }
-        NotificationManagerCompat.from(applicationContext).notify(1, builder.build())
-        return Result.success()
     }
-}
 }
