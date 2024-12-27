@@ -68,7 +68,9 @@ class MainActivity : AppCompatActivity() {
             @SuppressLint("SetTextI18n")
             override fun onTick(millisUntilFinished: Long) {
                 val secondsLeft = millisUntilFinished / 1000
+                val e: Int = (secondsLeft*5).toInt()
                 timerText.text = "Time left: $secondsLeft seconds"
+                progressBar.progress = 100 - e
                 Log.d("TIMER", "Seconds left: $secondsLeft")
             }
 

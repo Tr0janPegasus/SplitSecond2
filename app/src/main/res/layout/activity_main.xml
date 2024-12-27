@@ -14,13 +14,6 @@
         android:layout_gravity="center_horizontal" />
 
     <!-- Progress Bar -->
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:progress="0"
-        android:max="100"
-        android:layout_marginTop="16dp" />
 
     <!-- Timer TextView -->
 
@@ -42,6 +35,16 @@
         android:textSize="18sp"
         android:layout_marginTop="16dp"
         android:layout_gravity="center_horizontal" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:indeterminate="false"
+        android:indeterminateOnly="false"
+        android:layout_height="95dp"
+        android:max = "100"
+        android:progress = "45"/>
 
 
 </LinearLayout>
