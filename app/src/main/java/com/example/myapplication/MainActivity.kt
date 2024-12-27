@@ -6,7 +6,11 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.util.Log
+
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -23,21 +27,24 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var pointsTextView: TextView
     private lateinit var progressBar: ProgressBar
+    private lateinit var timerText: TextView
+    private var points = 0
     private val sharedPreferences by lazy {
         getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
     }
+    private var timer: CountDownTimer? = null // Timer to track 20 seconds
 
+    @SuppressLint("InlinedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         pointsTextView = findViewById(R.id.pointsTextView)
         progressBar = findViewById(R.id.progressBar)
+        timerText = findViewById(R.id.timerText)
 
-        // Create notification channel
         createNotificationChannel()
 
-        // Check for the POST_NOTIFICATIONS permission and request it if not granted
         if (ActivityCompat.checkSelfPermission(
                 this, Manifest.permission.POST_NOTIFICATIONS
             ) != PackageManager.PERMISSION_GRANTED
@@ -49,12 +56,27 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        // Update the UI initially
-        updateUI()
+        startTimer()
 
-        // Schedule periodic reminders
         val workRequest = PeriodicWorkRequestBuilder<ReminderWorker>(20, TimeUnit.MINUTES).build()
         WorkManager.getInstance(this).enqueue(workRequest)
+    }
+
+    private fun startTimer() {
+        Log.d("TIMER", "Starting timer...")
+        timer = object : CountDownTimer(20000, 1000) {
+            @SuppressLint("SetTextI18n")
+            override fun onTick(millisUntilFinished: Long) {
+                val secondsLeft = millisUntilFinished / 1000
+                timerText.text = "Time left: $secondsLeft seconds"
+                Log.d("TIMER", "Seconds left: $secondsLeft")
+            }
+
+            override fun onFinish() {
+                Log.d("TIMER", "Timer finished!")
+                addPoints(100)
+            }
+        }.start()
     }
 
     @SuppressLint("SetTextI18n")
@@ -74,38 +96,43 @@ class MainActivity : AppCompatActivity() {
         updateUI()
     }
 
-    private fun createNotificationChannel() {
-        val channel = NotificationChannel(
-            "ReminderChannel",
-            "Reminders",
-            NotificationManager.IMPORTANCE_HIGH
-        ).apply {
-            description = "Channel for SplitSecond reminders"
-        }
-        val notificationManager = getSystemService(NotificationManager::class.java)
-        notificationManager?.createNotificationChannel(channel)
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("TIMER", "Activity destroyed, cancelling timer...")
+        timer?.cancel() // Cancel the timer to prevent memory leaks
     }
 
-    // This worker sends the reminder notification every 20 minutes
+    @SuppressLint("ObsoleteSdkInt")
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                "ReminderChannel",
+                "Reminders",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Channel for SplitSecond reminders"
+            }
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager?.createNotificationChannel(channel)
+        }
+    }
+
     class ReminderWorker(appContext: Context, workerParams: WorkerParameters) :
         Worker(appContext, workerParams) {
 
         override fun doWork(): Result {
-            // Check if the permission is granted before showing the notification
             if (ActivityCompat.checkSelfPermission(
                     applicationContext, Manifest.permission.POST_NOTIFICATIONS
                 ) == PackageManager.PERMISSION_GRANTED
             ) {
-                // Show notification
                 val channelId = "ReminderChannel"
                 val builder = NotificationCompat.Builder(applicationContext, channelId)
                     .setContentTitle("Take a Break!")
                     .setContentText("Look away from your screen for a few minutes.")
-                    .setSmallIcon(R.drawable.ic_launcher2_background) // Replace with your app's icon
+                    .setSmallIcon(R.drawable.ic_launcher_foreground)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setAutoCancel(true)
 
-                // Notify the user
                 NotificationManagerCompat.from(applicationContext).notify(1, builder.build())
             }
 
