@@ -2,10 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Permission for Android 13+ to show notifications -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- Main application block -->
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -17,29 +15,24 @@
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
 
-        <!-- Main activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
-                <!-- Defines this activity as the app launcher -->
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- Backup rules (optional, ensure the referenced files exist in res/xml) -->
         <meta-data
             android:name="android.support.MULTIDEX"
             android:value="true" />
 
-        <!-- WorkManager SystemJobService -->
         <service
             android:name="androidx.work.impl.background.systemjob.SystemJobService"
             android:permission="android.permission.BIND_JOB_SERVICE"
             android:exported="true" />
 
-        <!-- WorkManager's GcmTaskService (if needed, for compatibility) -->
 
     </application>
 </manifest>
