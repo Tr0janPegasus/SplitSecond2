@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
                 val builder = NotificationCompat.Builder(applicationContext, channelId)
                     .setContentTitle("Take a Break!")
                     .setContentText("Look away from your screen for a few minutes.")
-                    .setSmallIcon(R.drawable.ic_launcher_foreground) // Replace with your app's icon
+                    .setSmallIcon(R.drawable.ic_launcher2_background) // Replace with your app's icon
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setAutoCancel(true)
 
