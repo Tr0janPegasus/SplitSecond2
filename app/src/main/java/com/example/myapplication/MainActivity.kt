@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
     private val sharedPreferences by lazy {
         getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
     }
-    private var timer: CountDownTimer? = null // Timer to track 20 seconds
+    private var timer: CountDownTimer? = null
 
     @SuppressLint("InlinedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         Log.d("TIMER", "Activity destroyed, cancelling timer...")
-        timer?.cancel() // Cancel the timer to prevent memory leaks
+        timer?.cancel()
     }
 
     @SuppressLint("ObsoleteSdkInt")

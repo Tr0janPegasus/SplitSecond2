@@ -47,5 +47,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation("androidx.core:core-ktx:1.9.10")
+    implementation("androidx.cardview:cardview:1.0.0")
 
 }

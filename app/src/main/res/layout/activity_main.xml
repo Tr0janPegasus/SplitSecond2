@@ -13,9 +13,6 @@
         android:textSize="20sp"
         android:layout_gravity="center_horizontal" />
 
-    <!-- Progress Bar -->
-
-    <!-- Timer TextView -->
 
 
     <!-- Optional: Start Timer Button -->
@@ -45,6 +42,10 @@
         android:layout_height="95dp"
         android:max = "100"
         android:progress = "45"/>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 
 </LinearLayout>
